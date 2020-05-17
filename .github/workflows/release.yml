@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: tools
-          repository: '${{ github.actor }}/stellevo-tf-provider'
+          repository: '${{ github.repository_owner }}/stellevo-tf-provider'
       - name: Copy provider-specific code to tools
         run: cp main/generation/*.go tools/generation && ls -al tools/generation
       - name: Build Docker image that will contain release artifacts
