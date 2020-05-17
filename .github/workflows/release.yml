@@ -5,6 +5,13 @@ on:
 
 name: Upload Generated TS files
 
+env:
+  TF_PROVIDER_VERSION: ${{ github.ref }}
+  TF_PROVIDER_NAME: azuread
+  TF_PROVIDER_REPO_DIR: azuread
+  DOCKER_IMAGE_NAME: generation-outputs
+  GO_VERSION: 1.13.4-alpine3.10
+
 jobs:
   build:
     name: Generate files and create release
@@ -22,13 +29,17 @@ jobs:
       - name: Copy provider-specific code to tools
         run: cp main/generation/*.go tools/generation && ls -al tools/generation
       - name: Build Docker image that will contain release artifacts
-        uses: docker/build-push-action@v1
-        with:
-          repository: generation-outputs
-          push: false
-          dockerfile: tools/Dockerfile
+        run: |
+          docker build \
+            --build-arg "GO_VERSION=${GO_VERSION}" \
+            --build-arg "TF_PROVIDER_VERSION=${TF_PROVIDER_VERSION}" \
+            --build-arg "TF_PROVIDER_NAME=${TF_PROVIDER_NAME}" \
+            --build-arg "TF_PROVIDER_REPO_DIR=${TF_PROVIDER_REPO_DIR}" \
+            --tag ${DOCKER_IMAGE_NAME} \
+            --file "tools/Dockerfile" \
+            tools
       - name: Copy the outputs out from created Docker image
-        run: docker run --rm --entrypoint sh -v "$(pwd)/outputs/:/target/:rw" generation-outputs -c 'cp -r /outputs/. /target/' && zip -r provider.zip outputs
+        run: docker run --rm --entrypoint sh -v "$(pwd)/outputs/:/target/:rw" ${DOCKER_IMAGE_NAME} -c 'cp -r /outputs/. /target/' && zip -r provider.zip outputs
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
