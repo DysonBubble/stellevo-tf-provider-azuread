@@ -32,7 +32,7 @@ jobs:
         run: |
           docker build \
             --build-arg "GO_VERSION=${GO_VERSION}" \
-            --build-arg "TF_PROVIDER_VERSION=${TF_PROVIDER_VERSION}" \
+            --build-arg "TF_PROVIDER_VERSION=${TF_PROVIDER_VERSION##*/}" \
             --build-arg "TF_PROVIDER_NAME=${TF_PROVIDER_NAME}" \
             --build-arg "TF_PROVIDER_REPO_DIR=${TF_PROVIDER_REPO_DIR}" \
             --tag ${DOCKER_IMAGE_NAME} \
