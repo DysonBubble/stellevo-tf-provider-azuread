@@ -8,7 +8,8 @@ import (
 
 func main() {
 	args := os.Args[1:]
-	DoMain(args[0], args[1], Provider().(*schema.Provider).ResourcesMap)
+	provider := Provider().(*schema.Provider)
+	DoMain(args[0], args[1], provider.ResourcesMap, provider.DataSourcesMap)
 }
 
 func ProviderSpecificInputPrelude() string {
